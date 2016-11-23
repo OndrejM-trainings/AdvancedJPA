@@ -1,9 +1,10 @@
 package entities;
 
+import java.io.Serializable;
 import javax.persistence.*;
 
 @Entity
-public class Address {
+public class Address implements Serializable {
 
     public static long countLoaded = 0;
     
