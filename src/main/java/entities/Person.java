@@ -10,6 +10,7 @@ public class Person implements Serializable {
     private static final long serialVersionUID = 1;
     
     @Id
+    @GeneratedValue
     private Long id;
 
     public Long getId() {
@@ -23,6 +24,15 @@ public class Person implements Serializable {
     private String firstName;
     private String surname;
     private int age;
+
+    public Person() {
+    }
+
+    public Person(String firstName, String surname, int age) {
+        this.firstName = firstName;
+        this.surname = surname;
+        this.age = age;
+    }
     
     @OneToMany
     private Set<Person> children; 

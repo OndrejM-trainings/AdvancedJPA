@@ -1,5 +1,6 @@
-package exercise01;
+package exercise02;
 
+import exercise01.*;
 import entities.Person;
 import javax.ejb.Stateless;
 import javax.inject.Inject;
