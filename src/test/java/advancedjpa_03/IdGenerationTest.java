@@ -3,7 +3,7 @@ package advancedjpa_03;
 import common.*;
 import exercise03.*;
 import javax.inject.Inject;
-import javax.transaction.Transactional;
+import javax.transaction.*;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.shrinkwrap.api.spec.JavaArchive;
@@ -17,6 +17,9 @@ public class IdGenerationTest {
 
     @Inject
     private PersonFactory personFactory;
+    
+    @Inject
+    private UserTransaction ut;
     
     @Deployment()
     public static JavaArchive createDeployment() {
@@ -40,10 +43,11 @@ public class IdGenerationTest {
      */
     
     @Test
-    @Transactional
-    public void should_create_person_and_get_id() {
+    public void should_create_person_and_get_id() throws NotSupportedException, SystemException {
+        ut.begin();
         final PersonWithIdUnspecified mrSmith = personFactory.createPerson("John", "Smith", 45);
         Assert.assertNotNull("Mr Smith does not exist", mrSmith);
         Assert.assertNotNull("Mr Smith does not have id", mrSmith.getId());
+        ut.rollback();
     }
 }
