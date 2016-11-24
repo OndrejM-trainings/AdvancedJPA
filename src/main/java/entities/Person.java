@@ -5,6 +5,8 @@ import java.util.Set;
 import javax.persistence.*;
 
 @Entity
+@NamedEntityGraph(name = "children", 
+               attributeNodes = @NamedAttributeNode(value = "children"))
 public class Person implements Serializable {
 
     private static final long serialVersionUID = 1;
