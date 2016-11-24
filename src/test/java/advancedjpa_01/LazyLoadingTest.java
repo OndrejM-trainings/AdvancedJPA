@@ -45,7 +45,7 @@ public class LazyLoadingTest {
     
     @Test
     public void should_have_person_with_children() {
-        final Person mrSmith = personService.findPersonByName("John", "Smith");
+        final Person mrSmith = personService.findPersonByName("John", "Smith", "children");
         Assert.assertNotNull("Mr Smith does not exist", mrSmith);
         try {
             Assert.assertEquals("Number of children", 3, mrSmith.getChildren().size());

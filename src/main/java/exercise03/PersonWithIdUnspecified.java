@@ -2,11 +2,14 @@ package exercise03;
 
 import java.io.Serializable;
 import javax.persistence.*;
+import static javax.persistence.GenerationType.TABLE;
 
 @Entity
+@TableGenerator(name = "tableGen", table = "t_generator")
 public class PersonWithIdUnspecified implements Serializable {
 
     @Id
+    @GeneratedValue(strategy = TABLE, generator = "tableGen")
     private Long id;
     
     private String firstName;
