@@ -6,6 +6,9 @@ import javax.persistence.Entity;
 public class Foreigner extends AbstractPerson {
     private String countryOfCitizenship;
 
+    public Foreigner() {
+    }
+
     public Foreigner(String firstName, String surname, int age) {
         super(firstName, surname, age);
     }

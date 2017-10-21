@@ -1,39 +1,34 @@
 package advancedjpa_04;
 
+import common.InTransaction;
 import common.*;
-import entities.Person;
+import entities.*;
 import java.util.List;
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.transaction.*;
-import org.jboss.arquillian.container.test.api.Deployment;
-import org.jboss.arquillian.junit.Arquillian;
-import org.jboss.shrinkwrap.api.spec.JavaArchive;
+import org.jglue.cdiunit.*;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.*;
 
-@RunWith(Arquillian.class)
+@RunWith(CdiRunner.class)
+@AdditionalClasses(JPAProducer.class)
 public class InheritanceTest {
 
-    @Inject 
-    private TestData testData;
-    
     @Inject
-    private UserTransaction ut;
-    
-    @Deployment()
-    public static JavaArchive createDeployment() {
-        return TstDeployment.createCommonJarDeployment("03");
-    }
+    private TestData testData;
+
+    @Inject
+    private EntityManager em;
 
     @Before
     public void init() throws Exception {
         testData.initData();
         testData.initDataPersons();
     }
-    
+
     /*
      * TODO: Vyskusat rozne typy dedicnosti
      * 
@@ -44,19 +39,15 @@ public class InheritanceTest {
      * 
      * Namapuj 
      */
-    
-    @Inject
-    private EntityManager em;
-    
     @Test
     public void should_load_persons() throws NotSupportedException, SystemException {
-        ut.begin();
-        
-        final List<Person> people = 
-                em.createQuery("select p from Person p", 
-                        Person.class).getResultList();
-        
-        Assert.assertTrue("People empty", !people.isEmpty());
-        ut.rollback();
+        InTransaction.executeAndCloseEm(em, () -> {
+            final List<AbstractPerson> people
+                    = em.createQuery("select p from AbstractPerson p",
+                            AbstractPerson.class).getResultList();
+
+            Assert.assertTrue("People empty", !people.isEmpty());
+        });
+
     }
 }

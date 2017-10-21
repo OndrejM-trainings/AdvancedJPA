@@ -1,35 +1,31 @@
 package advancedjpa_03;
 
+import common.InTransaction;
 import common.*;
 import exercise03.*;
 import javax.inject.Inject;
+import javax.persistence.EntityManager;
 import javax.transaction.*;
-import org.jboss.arquillian.container.test.api.Deployment;
-import org.jboss.arquillian.junit.Arquillian;
-import org.jboss.shrinkwrap.api.spec.JavaArchive;
+import org.jglue.cdiunit.*;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.*;
 
-@RunWith(Arquillian.class)
+@RunWith(CdiRunner.class)
+@AdditionalClasses(JPAProducer.class)
 public class IdGenerationTest {
 
     @Inject
     private PersonFactory personFactory;
-    
+
     @Inject
-    private UserTransaction ut;
-    
-    @Deployment()
-    public static JavaArchive createDeployment() {
-        return TstDeployment.createCommonJarDeployment("03");
-    }
+    private EntityManager em;
 
     @Before
     public void init() throws Exception {
     }
-    
+
     /*
      * TODO: Vyskusat rozne typy strategii generovania.
      * 
@@ -41,13 +37,12 @@ public class IdGenerationTest {
      * 
      * Pozri EntityWithIdIdentity, EntityWithIdSequence a EntityWithIdTable
      */
-    
     @Test
     public void should_create_person_and_get_id() throws NotSupportedException, SystemException {
-        ut.begin();
-        final PersonWithIdUnspecified mrSmith = personFactory.createPerson("John", "Smith", 45);
-        Assert.assertNotNull("Mr Smith does not exist", mrSmith);
-        Assert.assertNotNull("Mr Smith does not have id", mrSmith.getId());
-        ut.rollback();
+        InTransaction.executeAndCloseEm(em, () -> {
+            final PersonWithIdUnspecified mrSmith = personFactory.createPerson("John", "Smith", 45);
+            Assert.assertNotNull("Mr Smith does not exist", mrSmith);
+            Assert.assertNotNull("Mr Smith does not have id", mrSmith.getId());
+        });
     }
 }

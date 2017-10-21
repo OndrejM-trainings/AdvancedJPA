@@ -4,9 +4,20 @@ import javax.enterprise.context.*;
 import javax.enterprise.inject.Produces;
 import javax.persistence.*;
 
-@Dependent
+@ApplicationScoped
 public class JPAProducer {
-    @PersistenceContext(name = "test")
+    
+    private EntityManagerFactory emf = Persistence.createEntityManagerFactory("test");
+    
     @Produces
-    public EntityManager em;
+    @Dependent
+    public EntityManager getEm() {
+        return createEm();
+    }
+    
+    private EntityManager createEm() {
+        return emf.createEntityManager();
+    }
+    
+    
 }

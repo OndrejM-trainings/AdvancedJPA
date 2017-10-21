@@ -3,6 +3,7 @@ package entities;
 import java.io.Serializable;
 import java.util.Set;
 import javax.persistence.*;
+import static javax.persistence.FetchType.LAZY;
 
 @Entity
 public class Person implements Serializable {
@@ -34,7 +35,7 @@ public class Person implements Serializable {
         this.age = age;
     }
     
-    @OneToMany
+    @OneToMany(fetch = LAZY)
     private Set<Person> children; 
     
     @OneToOne

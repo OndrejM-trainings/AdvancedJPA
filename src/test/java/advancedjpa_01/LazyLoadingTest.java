@@ -4,33 +4,29 @@ import common.*;
 import entities.Person;
 import exercise01.PersonService;
 import javax.inject.Inject;
-import org.jboss.arquillian.container.test.api.Deployment;
-import org.jboss.arquillian.junit.Arquillian;
-import org.jboss.shrinkwrap.api.spec.JavaArchive;
+import org.jglue.cdiunit.*;
 import org.junit.Assert;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.junit.*;
+import static org.junit.Assert.fail;
+import org.junit.runner.RunWith;
 
-@RunWith(Arquillian.class)
+@RunWith(CdiRunner.class)
+@AdditionalClasses(JPAProducer.class)
 public class LazyLoadingTest {
 
     @Inject
     private PersonService personService;
-    
-    @Inject 
+
+    @Inject
     private TestData testData;
-    
-    @Deployment()
-    public static JavaArchive createDeployment() {
-        return TstDeployment.createCommonJarDeployment("01");
-    }
+
 
     @Before
     public void init() throws Exception {
         testData.initData();
     }
-    
+
     /*
      * TODO: Opravit test.
      * 
@@ -42,16 +38,14 @@ public class LazyLoadingTest {
      *  - pouzitie Fetch Join pre nacitanie children v query
      *  - zmena navratovej hodnoty z personService z entity Person na transfer objekt PersonDTO
      */
-    
     @Test
     public void should_have_person_with_children() {
         final Person mrSmith = personService.findPersonByName("John", "Smith");
-        Assert.assertNotNull("Mr Smith does not exist", mrSmith);
         try {
             Assert.assertEquals("Number of children", 3, mrSmith.getChildren().size());
         } catch (Exception e) {
             if ("LazyInitializationException".equals(e.getClass().getSimpleName())) {
-                throw new AssertionError("Children collection not read from the database", e);
+                fail("Children collection not read from the database");
             } else {
                 throw e;
             }

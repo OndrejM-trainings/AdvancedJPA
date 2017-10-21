@@ -4,8 +4,11 @@ import javax.persistence.*;
 
 @Entity
 @DiscriminatorValue("CITIZEN")
-public class Citizen extends Person {
+public class Citizen extends AbstractPerson {
     private String nationalIdNumber;
+
+    public Citizen() {
+    }
 
     public Citizen(String firstName, String surname, int age) {
         super(firstName, surname, age);

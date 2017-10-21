@@ -2,27 +2,30 @@ package common;
 
 import entities.*;
 import java.util.*;
-import javax.ejb.*;
-import static javax.ejb.TransactionAttributeType.REQUIRES_NEW;
+import javax.enterprise.inject.Instance;
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
 
-@Stateless
-@TransactionAttribute(REQUIRES_NEW)
 public class TestData {
 
     @Inject
+    private Instance<EntityManager> emProvider;
     private EntityManager em;
 
     public void initData() throws Exception {
-        initMrSmith();
+        em = emProvider.get();
+        InTransaction.executeAndCloseEm(em, () -> {
+            initMrSmith();
+        });
+        em = null;
     }
 
     private void initMrSmith() {
         Person p = new Person("John", "Smith", 45);
         p.setHomeAddress(anAddress());
         p.setChildren(someChildren(p.getSurname()));
-        
+        p.getChildren().iterator().next().setChildren(someChildren(p.getSurname() + "-grand"));
+
         em.persist(p);
     }
 
@@ -48,18 +51,33 @@ public class TestData {
         return new HashSet<>(children);
     }
 
-    public void initDataPersons() {
-        Citizen p = new Citizen("John", "Kane", 45);
-        p.setHomeAddress(anAddress());
-        p.setChildren(someChildren(p.getSurname()));
-        p.setNationalIdNumber("XA1254");
-        em.persist(p);
+    private Set<AbstractPerson> someAbstractChildren(String surname) {
+        final List<Citizen> children = Arrays.asList(
+                new Citizen("Jane", surname, 10),
+                new Citizen("Mike", surname, 8),
+                new Citizen("Paul", surname, 5));
+        for (Citizen p : children) {
+            em.persist(p);
+        }
+        return new HashSet<>(children);
+    }
 
-        Foreigner f = new Foreigner("John", "Smith", 45);
-        f.setHomeAddress(anAddress());
-        f.setChildren(someChildren(p.getSurname()));
-        f.setCountryOfCitizenship("Canada");
-        em.persist(f);
+    public void initDataPersons() {
+        em = emProvider.get();
+        InTransaction.executeAndCloseEm(em, () -> {
+            Citizen p = new Citizen("John", "Kane", 45);
+            p.setHomeAddress(anAddress());
+            p.setChildren(someAbstractChildren(p.getSurname()));
+            p.setNationalIdNumber("XA1254");
+            em.persist(p);
+
+            Foreigner f = new Foreigner("John", "Smith", 45);
+            f.setHomeAddress(anAddress());
+            f.setChildren(someAbstractChildren(p.getSurname()));
+            f.setCountryOfCitizenship("Canada");
+            em.persist(f);
+        });
+        em = null;
     }
 
 }

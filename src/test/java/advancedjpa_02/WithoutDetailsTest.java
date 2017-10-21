@@ -4,15 +4,14 @@ import common.*;
 import entities.*;
 import exercise02.PersonService;
 import javax.inject.Inject;
-import org.jboss.arquillian.container.test.api.Deployment;
-import org.jboss.arquillian.junit.Arquillian;
-import org.jboss.shrinkwrap.api.spec.JavaArchive;
+import org.jglue.cdiunit.*;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.*;
 
-@RunWith(Arquillian.class)
+@RunWith(CdiRunner.class)
+@AdditionalClasses(JPAProducer.class)
 public class WithoutDetailsTest {
 
     @Inject
@@ -21,11 +20,6 @@ public class WithoutDetailsTest {
     @Inject 
     private TestData testData;
     
-    @Deployment()
-    public static JavaArchive createDeployment() {
-        return TstDeployment.createCommonJarDeployment("02");
-    }
-
     @Before
     public void init() throws Exception {
         testData.initData();
