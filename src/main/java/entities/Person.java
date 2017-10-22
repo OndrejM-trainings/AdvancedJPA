@@ -1,7 +1,8 @@
 package entities;
 
+import exercise06.BirthYearConverter;
 import java.io.Serializable;
-import java.util.Set;
+import java.util.*;
 import javax.persistence.*;
 import static javax.persistence.FetchType.LAZY;
 
@@ -26,6 +27,10 @@ public class Person implements Serializable {
     private String surname;
     private int age;
     private String notes;
+    @Temporal(javax.persistence.TemporalType.DATE)
+    private Date yearOfBirth;
+    @Column(name = "yearOfBirth", updatable = false, insertable = false, nullable = false)
+    private String yearOfBirthAsString;
 
     public Person() {
     }
@@ -88,6 +93,18 @@ public class Person implements Serializable {
 
     public void setNotes(String notes) {
         this.notes = notes;
+    }
+
+    public Date getYearOfBirth() {
+        return yearOfBirth;
+    }
+
+    public void setYearOfBirth(Date yearOfBirth) {
+        this.yearOfBirth = yearOfBirth;
+    }
+
+    public String getYearOfBirthAsString() {
+        return yearOfBirthAsString;
     }
 
 }
