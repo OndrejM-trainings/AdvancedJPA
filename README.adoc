@@ -1,0 +1,5 @@
+Cvičenia ku kurzu JPA sú vo forme unit testov: link:src/test/java/[src/test/java/]
+
+Popis ku každému cvičeniu je v *.java súbore unit testu v komentári nad definíciou class testu.
+
+Slajdy k cvičeniam sú tu: link:Advanced_JPA.pdf[Advanced JPA.pdf]
