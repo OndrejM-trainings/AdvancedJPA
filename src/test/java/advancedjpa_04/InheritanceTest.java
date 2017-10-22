@@ -13,6 +13,15 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.*;
 
+/*
+ * TODO: Vyskusat rozne typy dedicnosti
+ * 
+ * Viac sposobov riesenia dedicnosti:
+ *  - TABLE_PER_CLASS
+ *  - JOIN
+ *  - SINGLE_TABLE
+ * 
+ */
 @RunWith(CdiRunner.class)
 @AdditionalClasses(JPAProducer.class)
 public class InheritanceTest {
@@ -36,16 +45,6 @@ public class InheritanceTest {
         contextController.closeRequest();
     }
 
-    /*
-     * TODO: Vyskusat rozne typy dedicnosti
-     * 
-     * Viac sposobov riesenia dedicnosti:
-     *  - TABLE_PER_CLASS
-     *  - JOIN
-     *  - SINGLE_TABLE
-     * 
-     * Namapuj 
-     */
     @Test
     @InRequestScope
     public void should_load_persons() throws NotSupportedException, SystemException {

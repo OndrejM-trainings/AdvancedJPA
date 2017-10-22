@@ -1,6 +1,5 @@
 package advancedjpa_06;
 
-import advancedjpa_01.*;
 import common.*;
 import entities.Person;
 import exercise01.PersonService;
@@ -11,9 +10,19 @@ import org.jglue.cdiunit.*;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.*;
-import static org.junit.Assert.fail;
 import org.junit.runner.RunWith;
 
+/*
+ * TODO: Opravit test.
+ * 
+ * Test zlyha kvoli tomu, ze datum narodenia je ulozeny ako datum, ale ma byt ulozeny ako rok v textovom formate.
+ *
+ * Viac sposobov riesenia:
+ *  - urobit dateOfBirth premennu v Person ako transient a ukladat hodnotu ako text pomocou prepersist, postload a postupdate
+ *  - pouzit konverter ktory bude prekladat Date na textovu hodnotu s rokom narodenia
+ *
+ * Mozeme este upravit typ yearOfBirth a zmenit ho z java.util.Date na java.time.Year
+ */
 @RunWith(CdiRunner.class)
 @AdditionalClasses(JPAProducer.class)
 public class ConverterTest {
@@ -39,15 +48,6 @@ public class ConverterTest {
         contextController.closeRequest();
     }
 
-    /*
-     * TODO: Opravit test.
-     * 
-     * Test zlyha kvoli tomu, ze datum narodenia je ulozeny ako datum, ale ma byt ulozeny ako rok v textovom formate.
-     *
-     * Viac sposobov riesenia:
-     *  - urobit dateOfBirth premennu v Person ako transient a ukladat hodnotu ako text pomocou prepersist, postload a postupdate
-     *  - pouzit konverter ktory bude prekladat Date na textovu hodnotu s rokom narodenia
-     */
     @Test
     public void should_have_person_with_children() {
         contextController.openRequest();

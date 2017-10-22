@@ -13,6 +13,17 @@ import org.junit.runner.RunWith;
 import org.junit.*;
 import static org.junit.Assert.fail;
 
+/*
+ * TODO: Vyskusat rozne typy strategii generovania.
+ * 
+ * Test zlyha kvoli tomu, ze pri volani em.persist nie je nastavene id.
+ *
+ * Viac sposobov riesenia:
+ *  - nastavit id v kode pred volanim em.persist
+ *  - pouzit generovanie id typu IDENTITY, SEQUENCE alebo TABLE pre PersonWithIdUnspecified
+ * 
+ * Pozri EntityWithIdIdentity, EntityWithIdSequence a EntityWithIdTable
+ */
 @RunWith(CdiRunner.class)
 @AdditionalClasses(JPAProducer.class)
 public class IdGenerationTest {
@@ -27,17 +38,6 @@ public class IdGenerationTest {
     public void init() throws Exception {
     }
 
-    /*
-     * TODO: Vyskusat rozne typy strategii generovania.
-     * 
-     * Test zlyha kvoli tomu, ze pri volani em.persist nie je nastavene id.
-     *
-     * Viac sposobov riesenia:
-     *  - nastavit id v kode pred volanim em.persist
-     *  - pouzit generovanie id typu IDENTITY, SEQUENCE alebo TABLE pre PersonWithIdUnspecified
-     * 
-     * Pozri EntityWithIdIdentity, EntityWithIdSequence a EntityWithIdTable
-     */
     @Test
     @InRequestScope
     public void should_create_person_and_get_id() throws NotSupportedException, SystemException {

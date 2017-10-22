@@ -11,6 +11,17 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.*;
 
+/*
+ * TODO: Opravit test.
+ * 
+ * Test zlyha kvoli tomu, ze v priebehu nacitania dat pre PersonWithoutDetails bola nacitana aspon jedna entita Address. 
+ * Bolo to kvoli tomu, ze personService nacita najprv entitu Person, co automaticky nacita Address v poli homeAdress, ktore je by default Eager.
+ *
+ * Viac sposobov riesenia:
+ *  - nastavit relaciu Person.homeAddress na Lazy
+ *  - vytvorit spolocneho predka pre Person a PersonWithoutDetails ako MappedSuperclass, ktora obsahuje iba eager nacitavane polia. 
+          Person bude obsahovat navyse ostatne polia, ale PersonWithoutDetails uz nic navyse obsahovat nebude. PersonService bude nacitat iba entitu PersonWithoutDetails, bez pola homeAddress.
+ */
 @RunWith(CdiRunner.class)
 @AdditionalClasses(JPAProducer.class)
 public class WithoutDetailsTest {
@@ -36,17 +47,6 @@ public class WithoutDetailsTest {
         contextController.closeRequest();
     }
 
-    /*
-     * TODO: Opravit test.
-     * 
-     * Test zlyha kvoli tomu, ze v priebehu nacitania dat pre PersonWithoutDetails bola nacitana aspon jedna entita Address. 
-     * Bolo to kvoli tomu, ze personService nacita najprv entitu Person, co automaticky nacita Address v poli homeAdress, ktore je by default Eager.
-     *
-     * Viac sposobov riesenia:
-     *  - nastavit relaciu Person.homeAddress na Lazy
-     *  - vytvorit spolocneho predka pre Person a PersonWithoutDetails ako MappedSuperclass, ktora obsahuje iba eager nacitavane polia. 
-              Person bude obsahovat navyse ostatne polia, ale PersonWithoutDetails uz nic navyse obsahovat nebude. PersonService bude nacitat iba entitu PersonWithoutDetails, bez pola homeAddress.
-     */
     @Test
     @InRequestScope
     public void should_have_person_without_loading_address() {

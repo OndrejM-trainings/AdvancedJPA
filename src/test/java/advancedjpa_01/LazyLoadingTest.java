@@ -12,6 +12,17 @@ import org.junit.*;
 import static org.junit.Assert.fail;
 import org.junit.runner.RunWith;
 
+/*
+ * TODO: Opravit test.
+ * 
+ * Test zlyha kvoli tomu, ze collection children nie je nacitana z databaze po ukonceni tranzakcie. 
+ * Upravte chovanie personService, aby nacitala z databaze celu kolekciu children. 
+ *
+ * Viac sposobov riesenia:
+ *  - manualne nacitanie kolekcie pred ukoncenim tranzakcie
+ *  - pouzitie Fetch Join pre nacitanie children v query
+ *  - zmena navratovej hodnoty z personService z entity Person na transfer objekt PersonDTO
+ */
 @RunWith(CdiRunner.class)
 @AdditionalClasses(JPAProducer.class)
 public class LazyLoadingTest {
@@ -37,17 +48,6 @@ public class LazyLoadingTest {
         contextController.closeRequest();
     }
 
-    /*
-     * TODO: Opravit test.
-     * 
-     * Test zlyha kvoli tomu, ze collection children nie je nacitana z databaze po ukonceni tranzakcie. 
-     * Upravte chovanie personService, aby nacitala z databaze celu kolekciu children. 
-     *
-     * Viac sposobov riesenia:
-     *  - manualne nacitanie kolekcie pred ukoncenim tranzakcie
-     *  - pouzitie Fetch Join pre nacitanie children v query
-     *  - zmena navratovej hodnoty z personService z entity Person na transfer objekt PersonDTO
-     */
     @Test
     @InRequestScope
     public void should_have_person_with_children() {
