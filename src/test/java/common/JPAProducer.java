@@ -10,7 +10,7 @@ public class JPAProducer {
     private EntityManagerFactory emf = Persistence.createEntityManagerFactory("test");
     
     @Produces
-    @Dependent
+    @RequestScoped
     public EntityManager getEm() {
         return createEm();
     }

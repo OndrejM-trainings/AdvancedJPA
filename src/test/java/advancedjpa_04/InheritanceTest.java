@@ -23,10 +23,17 @@ public class InheritanceTest {
     @Inject
     private EntityManager em;
 
+    @Inject
+    private ContextController contextController;
+
     @Before
     public void init() throws Exception {
-        testData.initData();
-        testData.initDataPersons();
+        contextController.openRequest();
+        InTransaction.executeAndCloseEm(em, () -> {
+            testData.initData();
+            testData.initDataPersons();
+        });
+        contextController.closeRequest();
     }
 
     /*
@@ -40,13 +47,14 @@ public class InheritanceTest {
      * Namapuj 
      */
     @Test
+    @InRequestScope
     public void should_load_persons() throws NotSupportedException, SystemException {
         InTransaction.executeAndCloseEm(em, () -> {
             final List<AbstractPerson> people
                     = em.createQuery("select p from AbstractPerson p",
                             AbstractPerson.class).getResultList();
 
-            Assert.assertTrue("People empty", !people.isEmpty());
+            Assert.assertTrue("People shouldn't be empty", !people.isEmpty());
         });
 
     }

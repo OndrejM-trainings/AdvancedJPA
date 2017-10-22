@@ -4,6 +4,7 @@ import common.*;
 import entities.Person;
 import exercise01.PersonService;
 import javax.inject.Inject;
+import javax.persistence.EntityManager;
 import org.jglue.cdiunit.*;
 import org.junit.Assert;
 import org.junit.Test;
@@ -21,10 +22,19 @@ public class LazyLoadingTest {
     @Inject
     private TestData testData;
 
+    @Inject
+    private ContextController contextController;
+    
+    @Inject
+    private EntityManager em;
 
     @Before
     public void init() throws Exception {
-        testData.initData();
+        contextController.openRequest();
+        InTransaction.executeAndCloseEm(em, () -> {
+            testData.initData();
+        });
+        contextController.closeRequest();
     }
 
     /*
@@ -39,6 +49,7 @@ public class LazyLoadingTest {
      *  - zmena navratovej hodnoty z personService z entity Person na transfer objekt PersonDTO
      */
     @Test
+    @InRequestScope
     public void should_have_person_with_children() {
         final Person mrSmith = personService.findPersonByName("John", "Smith");
         try {

@@ -2,22 +2,25 @@ package common;
 
 import entities.*;
 import java.util.*;
-import javax.enterprise.inject.Instance;
+import javax.enterprise.context.*;
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
 
+@RequestScoped
 public class TestData {
 
     @Inject
-    private Instance<EntityManager> emProvider;
     private EntityManager em;
 
-    public void initData() throws Exception {
-        em = emProvider.get();
-        InTransaction.executeAndCloseEm(em, () -> {
-            initMrSmith();
-        });
-        em = null;
+    public void initData() {
+        initMrSmith();
+    }
+
+    public Person getJohnSmith() {
+        final Person result = em.createQuery(
+                "select p from Person p where p.firstName = 'John' and p.surname = 'Smith' and p.age = 45",
+                Person.class).getSingleResult();
+        return result;
     }
 
     private void initMrSmith() {
@@ -25,6 +28,7 @@ public class TestData {
         p.setHomeAddress(anAddress());
         p.setChildren(someChildren(p.getSurname()));
         p.getChildren().iterator().next().setChildren(someChildren(p.getSurname() + "-grand"));
+        p.setNotes("");
 
         em.persist(p);
     }
@@ -63,21 +67,17 @@ public class TestData {
     }
 
     public void initDataPersons() {
-        em = emProvider.get();
-        InTransaction.executeAndCloseEm(em, () -> {
-            Citizen p = new Citizen("John", "Kane", 45);
-            p.setHomeAddress(anAddress());
-            p.setChildren(someAbstractChildren(p.getSurname()));
-            p.setNationalIdNumber("XA1254");
-            em.persist(p);
+        Citizen p = new Citizen("John", "Kane", 45);
+        p.setHomeAddress(anAddress());
+        p.setChildren(someAbstractChildren(p.getSurname()));
+        p.setNationalIdNumber("XA1254");
+        em.persist(p);
 
-            Foreigner f = new Foreigner("John", "Smith", 45);
-            f.setHomeAddress(anAddress());
-            f.setChildren(someAbstractChildren(p.getSurname()));
-            f.setCountryOfCitizenship("Canada");
-            em.persist(f);
-        });
-        em = null;
+        Foreigner f = new Foreigner("John", "Smith", 45);
+        f.setHomeAddress(anAddress());
+        f.setChildren(someAbstractChildren(p.getSurname()));
+        f.setCountryOfCitizenship("Canada");
+        em.persist(f);
     }
 
 }

@@ -25,6 +25,7 @@ public class Person implements Serializable {
     private String firstName;
     private String surname;
     private int age;
+    private String notes;
 
     public Person() {
     }
@@ -79,6 +80,14 @@ public class Person implements Serializable {
 
     public void setHomeAddress(Address homeAddress) {
         this.homeAddress = homeAddress;
+    }
+
+    public String getNotes() {
+        return notes;
+    }
+
+    public void setNotes(String notes) {
+        this.notes = notes;
     }
 
 }

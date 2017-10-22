@@ -11,6 +11,7 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.*;
+import static org.junit.Assert.fail;
 
 @RunWith(CdiRunner.class)
 @AdditionalClasses(JPAProducer.class)
@@ -38,11 +39,21 @@ public class IdGenerationTest {
      * Pozri EntityWithIdIdentity, EntityWithIdSequence a EntityWithIdTable
      */
     @Test
+    @InRequestScope
     public void should_create_person_and_get_id() throws NotSupportedException, SystemException {
         InTransaction.executeAndCloseEm(em, () -> {
-            final PersonWithIdUnspecified mrSmith = personFactory.createPerson("John", "Smith", 45);
-            Assert.assertNotNull("Mr Smith does not exist", mrSmith);
-            Assert.assertNotNull("Mr Smith does not have id", mrSmith.getId());
+            PersonWithIdUnspecified mrSmith = null;
+            try {
+                mrSmith = personFactory.createPerson("John", "Smith", 45);
+            } catch (Exception e) {
+                if (e.getCause() != null && "IdentifierGenerationException".equals(e.getCause().getClass().getSimpleName())) {
+                    fail("mrSmith wasn't saved to the database - no ID assigned");
+                } else {
+                    throw e;
+                }
+            }
+            Assert.assertNotNull("Mr Smith should exist", mrSmith);
+            Assert.assertNotNull("Mr Smith should have id", mrSmith.getId());
         });
     }
 }

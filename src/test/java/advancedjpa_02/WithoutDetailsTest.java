@@ -4,6 +4,7 @@ import common.*;
 import entities.*;
 import exercise02.PersonService;
 import javax.inject.Inject;
+import javax.persistence.EntityManager;
 import org.jglue.cdiunit.*;
 import org.junit.Assert;
 import org.junit.Test;
@@ -16,15 +17,25 @@ public class WithoutDetailsTest {
 
     @Inject
     private PersonService personService;
-    
-    @Inject 
+
+    @Inject
     private TestData testData;
+
+    @Inject
+    private ContextController contextController;
     
+    @Inject
+    private EntityManager em;
+
     @Before
     public void init() throws Exception {
-        testData.initData();
+        contextController.openRequest();
+        InTransaction.executeAndCloseEm(em, () -> {
+            testData.initData();
+        });
+        contextController.closeRequest();
     }
-    
+
     /*
      * TODO: Opravit test.
      * 
@@ -36,8 +47,8 @@ public class WithoutDetailsTest {
      *  - vytvorit spolocneho predka pre Person a PersonWithoutDetails ako MappedSuperclass, ktora obsahuje iba eager nacitavane polia. 
               Person bude obsahovat navyse ostatne polia, ale PersonWithoutDetails uz nic navyse obsahovat nebude. PersonService bude nacitat iba entitu PersonWithoutDetails, bez pola homeAddress.
      */
-    
     @Test
+    @InRequestScope
     public void should_have_person_without_loading_address() {
         final PersonWithoutDetails mrSmith = personService.findPersonByName("John", "Smith");
         Assert.assertNotNull("Mr Smith does not exist", mrSmith);

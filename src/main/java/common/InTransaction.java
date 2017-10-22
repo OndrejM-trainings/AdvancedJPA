@@ -39,7 +39,7 @@ public class InTransaction {
                 throw new RuntimeException(e);
             }
         } finally {
-            if (em.getTransaction().isActive()) {
+            if (em.getTransaction().isActive() && !em.getTransaction().getRollbackOnly()) {
                 em.getTransaction().commit();
             }
             if (close) em.close();
