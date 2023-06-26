@@ -1,10 +1,18 @@
 package entities;
 
-import exercise06.BirthYearConverter;
+import static jakarta.persistence.FetchType.LAZY;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
+import jakarta.persistence.Temporal;
+import jakarta.persistence.TemporalType;
 import java.io.Serializable;
-import java.util.*;
-import javax.persistence.*;
-import static javax.persistence.FetchType.LAZY;
+import java.util.Date;
+import java.util.Set;
 
 @Entity
 public class Person implements Serializable {
@@ -22,12 +30,12 @@ public class Person implements Serializable {
     public void setId(Long id) {
         this.id = id;
     }
-    
+
     private String firstName;
     private String surname;
     private int age;
     private String notes;
-    @Temporal(javax.persistence.TemporalType.DATE)
+    @Temporal(TemporalType.DATE)
     private Date yearOfBirth;
     @Column(name = "yearOfBirth", updatable = false, insertable = false, nullable = false)
     private String yearOfBirthAsString;
@@ -44,7 +52,7 @@ public class Person implements Serializable {
     @OneToMany(fetch = LAZY)
     private Set<Person> children; 
     
-    @OneToOne
+    @OneToOne(fetch = LAZY)
     private Address homeAddress;
 
     public String getFirstName() {

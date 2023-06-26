@@ -1,8 +1,12 @@
 package exercise03;
 
+import static jakarta.persistence.GenerationType.TABLE;
+
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.Id;
+import jakarta.persistence.TableGenerator;
 import java.io.Serializable;
-import javax.persistence.*;
-import static javax.persistence.GenerationType.*;
 
 @Entity
 @TableGenerator(name = "myTable", table = "T_ID_GENERATOR", allocationSize = 100)

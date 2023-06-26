@@ -1,10 +1,17 @@
 package common;
 
-import entities.*;
-import java.util.*;
-import javax.enterprise.context.*;
-import javax.inject.Inject;
-import javax.persistence.EntityManager;
+import entities.AbstractPerson;
+import entities.Address;
+import entities.Citizen;
+import entities.Foreigner;
+import entities.Person;
+import jakarta.enterprise.context.RequestScoped;
+import jakarta.inject.Inject;
+import jakarta.persistence.EntityManager;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 @RequestScoped
 public class TestData {

@@ -1,15 +1,20 @@
 package advancedjpa_02;
 
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.not;
+import static org.hamcrest.CoreMatchers.nullValue;
+import static org.hamcrest.MatcherAssert.assertThat;
+
 import common.*;
 import entities.*;
 import exercise02.PersonService;
-import javax.inject.Inject;
-import javax.persistence.EntityManager;
-import org.jglue.cdiunit.*;
-import org.junit.Assert;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.*;
+import jakarta.inject.Inject;
+import jakarta.persistence.EntityManager;
+import org.jboss.weld.junit5.auto.AddBeanClasses;
+import org.jboss.weld.junit5.auto.EnableAutoWeld;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /*
  * TODO: Opravit test.
@@ -22,9 +27,9 @@ import org.junit.*;
  *  - vytvorit spolocneho predka pre Person a PersonWithoutDetails ako MappedSuperclass, ktora obsahuje iba eager nacitavane polia. 
           Person bude obsahovat navyse ostatne polia, ale PersonWithoutDetails uz nic navyse obsahovat nebude. PersonService bude nacitat iba entitu PersonWithoutDetails, bez pola homeAddress.
  */
-@RunWith(CdiRunner.class)
-@AdditionalClasses(JPAProducer.class)
-public class WithoutDetailsTest {
+@EnableAutoWeld
+@AddBeanClasses({JPAProducer.class, PersonService.class})
+public class WithoutDetailsTest extends WeldTestBase {
 
     @Inject
     private PersonService personService;
@@ -33,25 +38,25 @@ public class WithoutDetailsTest {
     private TestData testData;
 
     @Inject
-    private ContextController contextController;
-    
-    @Inject
     private EntityManager em;
 
-    @Before
+    @BeforeEach
     public void init() throws Exception {
-        contextController.openRequest();
+        startRequest();
         InTransaction.executeAndCloseEm(em, () -> {
             testData.initData();
         });
-        contextController.closeRequest();
+        stopRequest();
     }
 
     @Test
-    @InRequestScope
     public void should_have_person_without_loading_address() {
+        startRequest();
         final PersonWithoutDetails mrSmith = personService.findPersonByName("John", "Smith");
-        Assert.assertNotNull("Mr Smith does not exist", mrSmith);
-        Assert.assertEquals("Number of loaded addresses", 0, Address.countLoaded);
+        stopRequest();
+
+        assertThat("Mr Smith does not exist", mrSmith, is((not(nullValue()))));
+        assertThat("Number of loaded addresses", Address.countLoaded, is(equalTo(0)));
+
     }
 }

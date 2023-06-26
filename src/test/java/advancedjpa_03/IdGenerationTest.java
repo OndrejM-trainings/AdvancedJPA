@@ -1,17 +1,24 @@
 package advancedjpa_03;
 
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.not;
+import static org.hamcrest.CoreMatchers.nullValue;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.jupiter.api.Assertions.fail;
+
 import common.InTransaction;
-import common.*;
-import exercise03.*;
-import javax.inject.Inject;
-import javax.persistence.EntityManager;
-import javax.transaction.*;
-import org.jglue.cdiunit.*;
-import org.junit.Assert;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.*;
-import static org.junit.Assert.fail;
+import common.JPAProducer;
+import common.WeldTestBase;
+import exercise03.PersonFactory;
+import exercise03.PersonWithIdUnspecified;
+import jakarta.inject.Inject;
+import jakarta.persistence.EntityManager;
+import jakarta.transaction.NotSupportedException;
+import jakarta.transaction.SystemException;
+import org.jboss.weld.junit5.auto.AddBeanClasses;
+import org.jboss.weld.junit5.auto.EnableAutoWeld;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /*
  * TODO: Vyskusat rozne typy strategii generovania.
@@ -24,9 +31,9 @@ import static org.junit.Assert.fail;
  * 
  * Pozri EntityWithIdIdentity, EntityWithIdSequence a EntityWithIdTable
  */
-@RunWith(CdiRunner.class)
-@AdditionalClasses(JPAProducer.class)
-public class IdGenerationTest {
+@EnableAutoWeld
+@AddBeanClasses({JPAProducer.class, PersonFactory.class})
+public class IdGenerationTest extends WeldTestBase {
 
     @Inject
     private PersonFactory personFactory;
@@ -34,13 +41,13 @@ public class IdGenerationTest {
     @Inject
     private EntityManager em;
 
-    @Before
+    @BeforeEach
     public void init() throws Exception {
     }
 
     @Test
-    @InRequestScope
     public void should_create_person_and_get_id() throws NotSupportedException, SystemException {
+        startRequest();
         InTransaction.executeAndCloseEm(em, () -> {
             PersonWithIdUnspecified mrSmith = null;
             try {
@@ -52,8 +59,8 @@ public class IdGenerationTest {
                     throw e;
                 }
             }
-            Assert.assertNotNull("Mr Smith should exist", mrSmith);
-            Assert.assertNotNull("Mr Smith should have id", mrSmith.getId());
+            assertThat("Mr Smith should exist", mrSmith, is((not(nullValue()))));
+            assertThat("Mr Smith should have id", mrSmith.getId(), is((not(nullValue()))));
         });
     }
 }

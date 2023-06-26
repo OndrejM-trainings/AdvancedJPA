@@ -1,8 +1,12 @@
 package exercise03;
 
+import static jakarta.persistence.GenerationType.SEQUENCE;
+
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.Id;
+import jakarta.persistence.SequenceGenerator;
 import java.io.Serializable;
-import javax.persistence.*;
-import static javax.persistence.GenerationType.*;
 
 @Entity
 @SequenceGenerator(name = "mySequence", allocationSize = 100, sequenceName = "S_ID_GENERATOR")

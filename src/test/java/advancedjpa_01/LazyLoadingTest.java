@@ -1,16 +1,25 @@
 package advancedjpa_01;
 
-import common.*;
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
+
 import entities.Person;
 import exercise01.PersonService;
-import javax.inject.Inject;
-import javax.persistence.EntityManager;
-import org.jglue.cdiunit.*;
-import org.junit.Assert;
-import org.junit.Test;
-import org.junit.*;
-import static org.junit.Assert.fail;
-import org.junit.runner.RunWith;
+
+import static org.junit.jupiter.api.Assertions.fail;
+
+import common.InTransaction;
+import common.JPAProducer;
+import common.TestData;
+import common.WeldTestBase;
+import jakarta.inject.Inject;
+import jakarta.persistence.EntityManager;
+import org.hibernate.LazyInitializationException;
+import org.jboss.weld.junit5.auto.AddBeanClasses;
+import org.jboss.weld.junit5.auto.EnableAutoWeld;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /*
  * TODO: Opravit test.
@@ -23,9 +32,9 @@ import org.junit.runner.RunWith;
  *  - pouzitie Fetch Join pre nacitanie children v query
  *  - zmena navratovej hodnoty z personService z entity Person na transfer objekt PersonDTO
  */
-@RunWith(CdiRunner.class)
-@AdditionalClasses(JPAProducer.class)
-public class LazyLoadingTest {
+@EnableAutoWeld
+@AddBeanClasses({JPAProducer.class, PersonService.class})
+public class LazyLoadingTest extends WeldTestBase {
 
     @Inject
     private PersonService personService;
@@ -34,32 +43,28 @@ public class LazyLoadingTest {
     private TestData testData;
 
     @Inject
-    private ContextController contextController;
-    
-    @Inject
     private EntityManager em;
 
-    @Before
+    @BeforeEach
     public void init() throws Exception {
-        contextController.openRequest();
+        startRequest();
         InTransaction.executeAndCloseEm(em, () -> {
             testData.initData();
         });
-        contextController.closeRequest();
+        stopRequest();
     }
 
     @Test
-    @InRequestScope
     public void should_have_person_with_children() {
+        startRequest();
         final Person mrSmith = personService.findPersonByName("John", "Smith");
+        stopRequest();
+
         try {
-            Assert.assertEquals("Number of children", 3, mrSmith.getChildren().size());
-        } catch (Exception e) {
-            if ("LazyInitializationException".equals(e.getClass().getSimpleName())) {
-                fail("Children collection not read from the database");
-            } else {
-                throw e;
-            }
+            assertThat("Number of children",
+                    mrSmith.getChildren().size(), is(equalTo(3)));
+        } catch (LazyInitializationException e) {
+            fail("Children collection not read from the database");
         }
     }
 }

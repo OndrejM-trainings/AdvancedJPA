@@ -1,17 +1,23 @@
 package advancedjpa_05;
 
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
+
 import common.InTransaction;
-import common.*;
-import entities.*;
-import javax.enterprise.context.RequestScoped;
-import javax.inject.Inject;
-import javax.persistence.EntityManager;
-import javax.transaction.*;
-import org.jglue.cdiunit.*;
-import org.junit.Assert;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.*;
+import common.JPAProducer;
+import common.TestData;
+import common.WeldTestBase;
+import entities.Person;
+import jakarta.enterprise.context.RequestScoped;
+import jakarta.inject.Inject;
+import jakarta.persistence.EntityManager;
+import jakarta.transaction.NotSupportedException;
+import jakarta.transaction.SystemException;
+import org.jboss.weld.junit5.auto.AddBeanClasses;
+import org.jboss.weld.junit5.auto.EnableAutoWeld;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /*
  * TODO: Zabranit prepisaniu data z tranzakcie 1 tranzakciou 2
@@ -25,9 +31,9 @@ import org.junit.*;
  *  - optimisticky zamok a restart tranzakcie pri zlyhani zapisu
  * 
  */
-@RunWith(CdiRunner.class)
-@AdditionalClasses({JPAProducer.class, LockingTest.Transaction1.class, LockingTest.Transaction2.class})
-public class LockingTest {
+@EnableAutoWeld
+@AddBeanClasses(JPAProducer.class)
+public class LockingTest extends WeldTestBase {
 
     @Inject
     private TestData testData;
@@ -36,37 +42,34 @@ public class LockingTest {
     private EntityManager em;
 
     @Inject
-    private ContextController contextController;
-
-    @Inject
     private Transaction1 transaction1;
 
     @Inject
     private Transaction2 transaction2;
 
-    @Before
+    @BeforeEach
     public void init() throws Exception {
-        contextController.openRequest();
+        startRequest();
         InTransaction.executeAndCloseEm(em, () -> {
             testData.initData();
             testData.initDataPersons();
         });
-        contextController.closeRequest();
+        stopRequest();
     }
 
     @Test
     public void update_in_parallel() throws NotSupportedException, SystemException, InterruptedException {
-        contextController.openRequest();
+        startRequest();
         Thread tx1 = new Thread(() -> {
-            contextController.openRequest();
+            startRequest();
             transaction1.run();
-            contextController.closeRequest();
+            stopRequest();
         });
 
         Thread tx2 = new Thread(() -> {
-            contextController.openRequest();
+            startRequest();
             transaction2.run();
-            contextController.closeRequest();
+            stopRequest();
         });
 
         tx1.start();
@@ -75,9 +78,9 @@ public class LockingTest {
         tx2.join();
         InTransaction.executeAndCloseEm(em, () -> {
             final Person person = testData.getJohnSmith();
-            Assert.assertEquals("Data from transaction 1 overwriten by transaction 2", "tx1", person.getNotes());
+            assertThat("Data from transaction 1 overwriten by transaction 2", person.getNotes(), is(equalTo("tx1")));
         });
-        contextController.closeRequest();
+        stopRequest();
     }
 
     @RequestScoped
@@ -128,7 +131,7 @@ public class LockingTest {
 
     private static void sleep(int i) {
         try {
-            Thread.sleep(1000);
+            Thread.sleep(i);
         } catch (InterruptedException ex) {
             throw new RuntimeException(ex);
         }

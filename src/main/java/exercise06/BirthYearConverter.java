@@ -1,7 +1,8 @@
 package exercise06;
 
+import jakarta.persistence.AttributeConverter;
+import jakarta.persistence.Converter;
 import java.util.*;
-import javax.persistence.*;
 
 @Converter
 public class BirthYearConverter implements AttributeConverter<Date, String> {

@@ -1,7 +1,8 @@
 package exercise03;
 
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
 import java.io.Serializable;
-import javax.persistence.*;
 
 @Entity
 public class PersonWithIdUnspecified implements Serializable {

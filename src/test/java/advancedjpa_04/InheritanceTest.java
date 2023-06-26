@@ -1,17 +1,24 @@
 package advancedjpa_04;
 
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.not;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.empty;
+
 import common.InTransaction;
-import common.*;
-import entities.*;
+import common.JPAProducer;
+import common.TestData;
+import common.WeldTestBase;
+import entities.AbstractPerson;
+import jakarta.inject.Inject;
+import jakarta.persistence.EntityManager;
+import jakarta.transaction.NotSupportedException;
+import jakarta.transaction.SystemException;
 import java.util.List;
-import javax.inject.Inject;
-import javax.persistence.EntityManager;
-import javax.transaction.*;
-import org.jglue.cdiunit.*;
-import org.junit.Assert;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.*;
+import org.jboss.weld.junit5.auto.AddBeanClasses;
+import org.jboss.weld.junit5.auto.EnableAutoWeld;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /*
  * TODO: Vyskusat rozne typy dedicnosti
@@ -22,9 +29,9 @@ import org.junit.*;
  *  - SINGLE_TABLE
  * 
  */
-@RunWith(CdiRunner.class)
-@AdditionalClasses(JPAProducer.class)
-public class InheritanceTest {
+@EnableAutoWeld
+@AddBeanClasses(JPAProducer.class)
+public class InheritanceTest extends WeldTestBase {
 
     @Inject
     private TestData testData;
@@ -32,29 +39,27 @@ public class InheritanceTest {
     @Inject
     private EntityManager em;
 
-    @Inject
-    private ContextController contextController;
-
-    @Before
+    @BeforeEach
     public void init() throws Exception {
-        contextController.openRequest();
+        startRequest();
         InTransaction.executeAndCloseEm(em, () -> {
             testData.initData();
             testData.initDataPersons();
         });
-        contextController.closeRequest();
+        stopRequest();
     }
 
     @Test
-    @InRequestScope
     public void should_load_persons() throws NotSupportedException, SystemException {
+        startRequest();
         InTransaction.executeAndCloseEm(em, () -> {
             final List<AbstractPerson> people
                     = em.createQuery("select p from AbstractPerson p",
                             AbstractPerson.class).getResultList();
 
-            Assert.assertTrue("People shouldn't be empty", !people.isEmpty());
+            assertThat("People shouldn't be empty", people, is(not(empty())));
         });
+        stopRequest();
 
     }
 }

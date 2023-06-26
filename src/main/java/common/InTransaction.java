@@ -1,7 +1,7 @@
 package common;
 
+import jakarta.persistence.EntityManager;
 import java.util.concurrent.Callable;
-import javax.persistence.EntityManager;
 
 public class InTransaction {
 

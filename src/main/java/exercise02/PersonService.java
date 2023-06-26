@@ -2,9 +2,9 @@ package exercise02;
 
 import common.InTransaction;
 import entities.*;
-import javax.inject.Inject;
-import javax.persistence.EntityManager;
-import javax.transaction.Transactional;
+import jakarta.inject.Inject;
+import jakarta.persistence.EntityManager;
+import jakarta.transaction.Transactional;
 
 @Transactional
 public class PersonService {

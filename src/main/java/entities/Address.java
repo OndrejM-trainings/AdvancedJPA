@@ -1,7 +1,10 @@
 package entities;
 
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.Id;
+import jakarta.persistence.PostLoad;
 import java.io.Serializable;
-import javax.persistence.*;
 
 @Entity
 public class Address implements Serializable {

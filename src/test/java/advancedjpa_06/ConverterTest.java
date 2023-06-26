@@ -1,16 +1,23 @@
 package advancedjpa_06;
 
-import common.*;
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
+
+import common.InTransaction;
+import common.JPAProducer;
+import common.TestData;
+import common.WeldTestBase;
 import entities.Person;
 import exercise01.PersonService;
-import java.util.*;
-import javax.inject.Inject;
-import javax.persistence.EntityManager;
-import org.jglue.cdiunit.*;
-import org.junit.Assert;
-import org.junit.Test;
-import org.junit.*;
-import org.junit.runner.RunWith;
+import jakarta.inject.Inject;
+import jakarta.persistence.EntityManager;
+import java.util.Calendar;
+import java.util.Date;
+import org.jboss.weld.junit5.auto.AddBeanClasses;
+import org.jboss.weld.junit5.auto.EnableAutoWeld;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /*
  * TODO: Opravit test.
@@ -23,9 +30,9 @@ import org.junit.runner.RunWith;
  *
  * Mozeme este upravit typ yearOfBirth a zmenit ho z java.util.Date na java.time.Year
  */
-@RunWith(CdiRunner.class)
-@AdditionalClasses(JPAProducer.class)
-public class ConverterTest {
+@EnableAutoWeld
+@AddBeanClasses({JPAProducer.class, PersonService.class})
+public class ConverterTest extends WeldTestBase {
 
     @Inject
     private PersonService personService;
@@ -34,31 +41,28 @@ public class ConverterTest {
     private TestData testData;
 
     @Inject
-    private ContextController contextController;
-
-    @Inject
     private EntityManager em;
 
-    @Before
+    @BeforeEach
     public void init() throws Exception {
-        contextController.openRequest();
+        startRequest();
         InTransaction.executeAndCloseEm(em, () -> {
             testData.initData();
         });
-        contextController.closeRequest();
+        stopRequest();
     }
 
     @Test
     public void should_have_person_with_children() {
-        contextController.openRequest();
+        startRequest();
         personService.setBirthYearToPerson(getBirthDate(), "John", "Smith");
-        contextController.closeRequest();
+        stopRequest();
 
-        contextController.openRequest();
+        startRequest();
         Person mrSmith = personService.findPersonByName("John", "Smith");
-        Assert.assertEquals("Year of birth as string should be just year of birth", 
-                "2000", mrSmith.getYearOfBirthAsString());
-        contextController.closeRequest();
+        assertThat("Year of birth as string should be just year of birth",
+                mrSmith.getYearOfBirthAsString(), is(equalTo("2000")));
+        stopRequest();
     }
 
     private Date getBirthDate() {
@@ -66,4 +70,5 @@ public class ConverterTest {
         cal.set(2000, 1, 1);
         return cal.getTime();
     }
+
 }

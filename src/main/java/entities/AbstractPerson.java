@@ -1,9 +1,16 @@
 package entities;
 
+import static jakarta.persistence.InheritanceType.SINGLE_TABLE;
+
+import jakarta.persistence.DiscriminatorColumn;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.Id;
+import jakarta.persistence.Inheritance;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
 import java.io.Serializable;
 import java.util.Set;
-import javax.persistence.*;
-import static javax.persistence.InheritanceType.*;
 
 @Entity
 @Inheritance(strategy = SINGLE_TABLE)
